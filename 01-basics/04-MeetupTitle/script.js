@@ -22,17 +22,17 @@ const root = {
     };
   },
   watch: {
-    meetupId(value) {
-      this.setTitle(value);
+    meetupId: {
+      immediate: true,
+      handler(value) {
+        this.setTitle(value);
+      },
     },
   },
   methods: {
     async setTitle(value) {
       this.title = (await fetchMeetupById(value)).title;
     },
-  },
-  created() {
-    this.setTitle(1);
   },
 };
 

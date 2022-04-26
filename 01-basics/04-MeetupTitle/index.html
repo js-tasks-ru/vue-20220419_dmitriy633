@@ -7,7 +7,7 @@
   <body>
     <div id="app">
       <div>
-        <label v-for="index in [...Array(5).keys()].map(i => i + 1)" :key="index">
+        <label v-for="index in 5" :key="index">
           <input type="radio" name="meetupId" :value="index" v-model="meetupId" />
           {{ index }}
         </label>

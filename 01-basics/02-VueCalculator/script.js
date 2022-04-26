@@ -5,37 +5,16 @@ const root = {
     return {
       a: 0,
       b: 0,
-      result: 0,
       operator: 'sum',
     };
   },
-  watch: {
-    a() {
-      this.calculate();
-    },
-    b() {
-      this.calculate();
-    },
-    operator() {
-      this.calculate();
-    },
-  },
-  methods: {
-    calculate() {
-      switch (this.operator) {
-        case 'sum':
-          this.result = this.a + this.b;
-          break;
-        case 'subtract':
-          this.result = this.a - this.b;
-          break;
-        case 'multiply':
-          this.result = this.a * this.b;
-          break;
-        case 'divide':
-          this.result = this.a / this.b;
-          break;
-      }
+  computed: {
+    result() {
+      if (this.operator === 'sum') return this.a + this.b;
+      if (this.operator === 'subtract') return this.a - this.b;
+      if (this.operator === 'multiply') return this.a * this.b;
+      if (this.operator === 'divide') return this.a / this.b;
+      return 0;
     },
   },
 };
