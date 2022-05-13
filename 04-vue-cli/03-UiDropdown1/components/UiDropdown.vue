@@ -1,21 +1,34 @@
 <template>
-  <div class="dropdown dropdown_opened">
-    <button type="button" class="dropdown__toggle dropdown__toggle_icon">
-      <ui-icon icon="tv" class="dropdown__icon" />
-      <span>Title</span>
+  <div class="dropdown" :class="{ dropdown_opened: dropdownOpened }">
+    <button
+      type="button"
+      class="dropdown__toggle"
+      :class="{ dropdown__toggle_icon: hasAnyIcon }"
+      @click="dropdownClick"
+    >
+      <ui-icon v-if="selectedOption && selectedOption.icon" :icon="selectedOption.icon" class="dropdown__icon" />
+      <span>{{ (selectedOption && selectedOption.text) || title }}</span>
     </button>
 
-    <div class="dropdown__menu" role="listbox">
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <ui-icon icon="tv" class="dropdown__icon" />
-        Option 1
-      </button>
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <ui-icon icon="tv" class="dropdown__icon" />
-        Option 2
+    <div v-show="dropdownOpened" class="dropdown__menu" role="listbox">
+      <button
+        v-for="option in options"
+        class="dropdown__item"
+        :class="{ dropdown__item_icon: hasAnyIcon }"
+        role="option"
+        type="button"
+        :value="option.value"
+        @click="optionClick"
+      >
+        <ui-icon v-if="option.icon" :icon="option.icon" class="dropdown__icon" />
+        {{ option.text }}
       </button>
     </div>
   </div>
+
+  <select v-show="false" :value="modelValue" @change="selectChange">
+    <option v-for="option in options" :key="option.value" :value="option.value">{{ option.text }}</option>
+  </select>
 </template>
 
 <script>
@@ -25,6 +38,59 @@ export default {
   name: 'UiDropdown',
 
   components: { UiIcon },
+
+  props: {
+    options: {
+      type: Array,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    modelValue: {
+      type: String,
+    },
+  },
+
+  emits: ['update:modelValue'],
+
+  data() {
+    return {
+      selectedOption: null,
+      dropdownOpened: false,
+    };
+  },
+
+  computed: {
+    hasAnyIcon() {
+      return this.options.some((item) => item.icon);
+    },
+  },
+
+  watch: {
+    modelValue: {
+      immediate: true,
+      handler(value) {
+        if (value) {
+          this.selectedOption = this.options.find((item) => item.value === value);
+        }
+      },
+    },
+  },
+
+  methods: {
+    dropdownClick() {
+      this.dropdownOpened = !this.dropdownOpened;
+    },
+    optionClick(event) {
+      this.$emit('update:modelValue', event.target.value);
+      this.dropdownOpened = false;
+    },
+    selectChange(event) {
+      this.$emit('update:modelValue', event.target.value);
+    },
+  },
 };
 </script>
 
