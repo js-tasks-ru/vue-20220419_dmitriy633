@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import UiToast from './UiToast';
+import UiToast from './UIToast';
 
 export default {
   name: 'TheToaster',
