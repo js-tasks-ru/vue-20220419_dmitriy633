@@ -8,16 +8,6 @@
 <script>
 import UiIcon from './UiIcon';
 
-const icons = {
-  success: 'check-circle',
-  error: 'alert-circle',
-};
-
-const classes = {
-  success: 'toast_success',
-  error: 'toast_error',
-};
-
 export default {
   name: 'UiToast',
 
@@ -28,19 +18,20 @@ export default {
     type: String,
   },
 
-  data() {
-    return {
-      icons,
-      classes,
-    };
-  },
-
   computed: {
     extraCls() {
-      return this.classes[this.type];
+      const classes = {
+        success: 'toast_success',
+        error: 'toast_error',
+      };
+      return classes[this.type];
     },
     icon() {
-      return this.icons[this.type];
+      const icons = {
+        success: 'check-circle',
+        error: 'alert-circle',
+      };
+      return icons[this.type];
     },
   },
 };

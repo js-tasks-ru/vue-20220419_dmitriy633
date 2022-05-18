@@ -1,8 +1,6 @@
 <template>
   <div class="toasts">
-    <template v-for="toast in toasts" :key="toast">
-      <ui-toast :type="toast.type" :message="toast.message" />
-    </template>
+    <ui-toast v-for="toast in toasts" :key="toast" :type="toast.type" :message="toast.message" />
   </div>
 </template>
 

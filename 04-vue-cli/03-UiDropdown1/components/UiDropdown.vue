@@ -57,7 +57,6 @@ export default {
 
   data() {
     return {
-      selectedOption: null,
       dropdownOpened: false,
     };
   },
@@ -66,16 +65,8 @@ export default {
     hasAnyIcon() {
       return this.options.some((item) => item.icon);
     },
-  },
-
-  watch: {
-    modelValue: {
-      immediate: true,
-      handler(value) {
-        if (value) {
-          this.selectedOption = this.options.find((item) => item.value === value);
-        }
-      },
+    selectedOption() {
+      return this.modelValue && this.options.find((item) => item.value === this.modelValue);
     },
   },
 
