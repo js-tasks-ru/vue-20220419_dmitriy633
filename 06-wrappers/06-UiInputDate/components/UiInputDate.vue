@@ -1,5 +1,5 @@
 <template>
-  <ui-input v-model="customModel" :type="type" valueAsNumber>
+  <ui-input :model-value="customModel" :type="type" @input="customModel = $event.target.valueAsNumber">
     <template v-for="slotName in Object.keys($slots)" #[slotName]>
       <slot :name="slotName" />
     </template>
@@ -27,7 +27,7 @@ export default {
     },
   },
 
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'update:customModel'],
 
   computed: {
     customModel: {
