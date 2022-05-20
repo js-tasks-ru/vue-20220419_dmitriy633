@@ -1,8 +1,21 @@
 <template>
   <div class="image-uploader">
-    <label class="image-uploader__preview image-uploader__preview-loading" style="--bg-url: url('/link.jpeg')">
-      <span class="image-uploader__text">Загрузить изображение</span>
-      <input type="file" accept="image/*" class="image-uploader__input" />
+    <label
+      class="image-uploader__preview"
+      :class="{ 'image-uploader__preview-loading': status === 'loading' }"
+      :style="preview && `--bg-url: url('${preview}')`"
+      @click="onImageClick"
+    >
+      <span class="image-uploader__text">{{ text }}</span>
+
+      <input
+        ref="fileInput"
+        type="file"
+        v-bind="$attrs"
+        accept="image/*"
+        class="image-uploader__input"
+        @change="onChangeFile"
+      />
     </label>
   </div>
 </template>
@@ -10,6 +23,84 @@
 <script>
 export default {
   name: 'UiImageUploader',
+  inheritAttrs: false,
+
+  props: {
+    preview: String,
+    uploader: Function,
+  },
+
+  emits: ['select', 'upload', 'error', 'remove'],
+
+  data() {
+    return {
+      fileObject: null,
+      status: null,
+    };
+  },
+
+  computed: {
+    text() {
+      const statusToText = {
+        empty: 'Загрузить изображение',
+        loading: 'Загрузка...',
+        loaded: 'Удалить изображение',
+      };
+      return statusToText[this.status];
+    },
+  },
+
+  watch: {
+    preview: {
+      immediate: true,
+      handler(value) {
+        this.status = value ? 'loaded' : 'empty';
+      },
+    },
+  },
+
+  methods: {
+    reset() {
+      this.$refs.fileInput.value = '';
+      this.fileObject = null;
+    },
+
+    async upload(file) {
+      return (this.uploader && (await this.uploader(file))) || { image: URL.createObjectURL(file) };
+    },
+
+    onImageClick(e) {
+      const hasFile = this.preview || this.fileObject;
+
+      if (hasFile) {
+        e.preventDefault();
+        this.reset();
+
+        this.$emit('remove');
+        this.status = 'empty';
+      }
+    },
+
+    async onChangeFile(event) {
+      const fileObj = event.target.files[0];
+
+      this.status = 'loading';
+      this.$emit('select', fileObj);
+
+      try {
+        const uploadedFileObj = await this.upload(fileObj);
+        this.fileObject = fileObj;
+
+        this.$emit('upload', uploadedFileObj);
+        this.status = 'loaded';
+      } catch (e) {
+        this.reset();
+
+        this.$emit('error', e);
+        this.status = 'empty';
+      }
+    },
+  },
 };
 </script>
 
