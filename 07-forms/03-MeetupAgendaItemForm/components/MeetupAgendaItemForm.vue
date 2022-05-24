@@ -1,42 +1,60 @@
 <template>
   <fieldset class="agenda-item-form">
-    <button type="button" class="agenda-item-form__remove-button">
+    <button type="button" class="agenda-item-form__remove-button" @click="$emit('remove')">
       <ui-icon icon="trash" />
     </button>
 
     <ui-form-group>
-      <ui-dropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" />
+      <ui-dropdown
+        v-model="internalAgendaItem.type"
+        title="Тип"
+        :options="$options.agendaItemTypeOptions"
+        name="type"
+      />
     </ui-form-group>
 
     <div class="agenda-item-form__row">
       <div class="agenda-item-form__col">
         <ui-form-group label="Начало">
-          <ui-input type="time" placeholder="00:00" name="startsAt" />
+          <ui-input
+            :model-value="internalAgendaItem.startsAt"
+            type="time"
+            placeholder="00:00"
+            name="startsAt"
+            @change="changeStartsAt(internalAgendaItem, $event)"
+          />
         </ui-form-group>
       </div>
       <div class="agenda-item-form__col">
         <ui-form-group label="Окончание">
-          <ui-input type="time" placeholder="00:00" name="endsAt" />
+          <ui-input v-model="internalAgendaItem.endsAt" type="time" placeholder="00:00" name="endsAt" />
         </ui-form-group>
       </div>
     </div>
 
-    <ui-form-group label="Тема">
-      <ui-input name="title" />
+    <ui-form-group :label="titleText">
+      <ui-input v-model="internalAgendaItem.title" name="title" />
     </ui-form-group>
-    <ui-form-group label="Докладчик">
-      <ui-input name="speaker" />
+    <ui-form-group v-if="internalAgendaItem.type === 'talk'" label="Докладчик">
+      <ui-input v-model="internalAgendaItem.speaker" name="speaker" />
     </ui-form-group>
-    <ui-form-group label="Описание">
-      <ui-input multiline name="description" />
+    <ui-form-group v-if="['talk', 'other'].includes(internalAgendaItem.type)" label="Описание">
+      <ui-input v-model="internalAgendaItem.description" multiline name="description" />
     </ui-form-group>
-    <ui-form-group label="Язык">
-      <ui-dropdown title="Язык" :options="$options.talkLanguageOptions" name="language" />
+    <ui-form-group v-if="internalAgendaItem.type === 'talk'" label="Язык">
+      <ui-dropdown
+        v-model="internalAgendaItem.language"
+        title="Язык"
+        :options="$options.talkLanguageOptions"
+        name="language"
+      />
     </ui-form-group>
   </fieldset>
 </template>
 
 <script>
+import moment from 'moment';
+
 import UiIcon from './UiIcon';
 import UiFormGroup from './UiFormGroup';
 import UiInput from './UiInput';
@@ -88,6 +106,50 @@ export default {
     agendaItem: {
       type: Object,
       required: true,
+    },
+  },
+
+  emits: ['update:agendaItem', 'remove'],
+
+  data() {
+    return {
+      internalAgendaItem: { ...this.agendaItem },
+    };
+  },
+
+  computed: {
+    titleText() {
+      const typeToTitle = {
+        talk: 'Тема',
+        other: 'Заголовок',
+      };
+      return typeToTitle[this.internalAgendaItem.type] || 'Нестандартный текст (необязательно)';
+    },
+  },
+
+  watch: {
+    internalAgendaItem: {
+      deep: true,
+      handler(value) {
+        this.$emit('update:agendaItem', value);
+      },
+    },
+  },
+
+  methods: {
+    changeStartsAt(agendaItem, event) {
+      const format = 'HH:mm';
+      const newStartsAt = event.target.value;
+      const startsAtMoment = moment(agendaItem.startsAt, format);
+      const endsAtMoment = moment(agendaItem.endsAt, format);
+      const newEndsAtMoment = moment(newStartsAt, format).add(endsAtMoment.diff(startsAtMoment), 'ms');
+      const newEndsAt = newEndsAtMoment.format(format);
+
+      this.internalAgendaItem = {
+        ...this.internalAgendaItem,
+        startsAt: newStartsAt,
+        endsAt: newEndsAt,
+      };
     },
   },
 };
