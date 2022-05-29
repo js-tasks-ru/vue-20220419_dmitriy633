@@ -1,6 +1,6 @@
 <template>
   <main class="mini-messenger">
-    <ul class="messages">
+    <ul id="list" class="messages">
       <li v-for="message in messages" :key="message.id" ref="items" class="message">
         {{ message.text }}
       </li>
@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import { watch } from 'vue';
+
 let lastId = 0;
 
 export default {
@@ -31,6 +33,10 @@ export default {
     };
   },
 
+  mounted() {
+    watch(this.messages, this.scroll, { flush: 'post' });
+  },
+
   methods: {
     handleSendSubmit() {
       this.send();
@@ -42,6 +48,11 @@ export default {
         text: this.newMessage,
       });
       this.newMessage = '';
+    },
+
+    scroll() {
+      const element = document.getElementById('list');
+      element.scrollTop = element.scrollHeight;
     },
   },
 };
