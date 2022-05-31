@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { computed, toRef, watch } from 'vue';
+import { nextTick } from 'vue';
 
 let lastId = 0;
 
@@ -33,29 +33,20 @@ export default {
     };
   },
 
-  watch: {
-    'messages.length': {
-      handler(newLength, oldLength) {
-        if (newLength > oldLength) {
-          this.scroll();
-        }
-      },
-      flush: 'post',
-      immediate: true,
-    },
-  },
-
   methods: {
-    handleSendSubmit() {
-      this.send();
+    async handleSendSubmit() {
+      await this.send();
     },
 
-    send() {
+    async send() {
       this.messages.push({
         id: lastId++,
         text: this.newMessage,
       });
       this.newMessage = '';
+
+      await nextTick();
+      this.scroll();
     },
 
     scroll() {
