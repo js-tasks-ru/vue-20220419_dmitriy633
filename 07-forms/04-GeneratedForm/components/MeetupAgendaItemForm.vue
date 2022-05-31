@@ -215,11 +215,8 @@ export default {
       const newEndsAtMoment = moment(newStartsAt, format).add(endsAtMoment.diff(startsAtMoment), 'ms');
       const newEndsAt = newEndsAtMoment.format(format);
 
-      this.internalAgendaItem = {
-        ...this.internalAgendaItem,
-        startsAt: newStartsAt,
-        endsAt: newEndsAt,
-      };
+      this.internalAgendaItem.startsAt = newStartsAt;
+      this.internalAgendaItem.endsAt = newEndsAt;
     },
   },
 };
