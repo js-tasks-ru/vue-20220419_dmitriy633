@@ -1,5 +1,5 @@
 <script>
-import { isVNode } from 'vue';
+import { isVNode, h } from 'vue';
 
 export default {
   name: 'VNode',
@@ -10,6 +10,10 @@ export default {
       require: true,
       validator: (vnodes) => (Array.isArray(vnodes) ? vnodes : [vnodes]).every((mustBeVNode) => isVNode(mustBeVNode)),
     },
+  },
+
+  render() {
+    return [].concat(this.vnode);
   },
 };
 </script>
